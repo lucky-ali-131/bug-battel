@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact - BugFix Battle</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      background: #0d0d0d;
+      color: #00ffcc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+    }
+    input, textarea {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 90%;
+      background: #111;
+      border: 1px solid #00ffcc;
+      color: #00ffcc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #00ffcc;
+      border: none;
+      border-radius: 5px;
+      color: #000;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #00ddb3;
+    }
+    nav {
+      margin-bottom: 30px;
+    }
+    nav a {
+      color: #00ffcc;
+      text-decoration: none;
+      margin: 0 10px;
+      font-weight: bold;
+    }
+    nav a:hover, nav .active {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Contact Us</h1>
+
+    </nav>
+
+    <input type="text" id="name" placeholder="Your Name" />
+<input type="email" id="email" placeholder="Your Email" />
+<textarea id="message" placeholder="Your Message"></textarea>
+<button onclick="sendToWhatsApp()">Send Message</button>
+
+</div>
+<script>
+  function sendToWhatsApp() {
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const message = document.getElementById("message").value.trim();
+
+    if (!name || !email || !message) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    const phoneNumber = "9122672811";
+    const fullMessage = `Hello! \n\nName: ${name}\nEmail: ${email}\nMessage: ${message}`;
+    const encodedMessage = encodeURIComponent(fullMessage);
+
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappURL, "_blank");
+  }
+</script>
+
+</body>
+</html>

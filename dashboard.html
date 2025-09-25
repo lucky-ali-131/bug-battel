@@ -1,0 +1,228 @@
+<!-- dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Courier New', monospace;
+      background: #0d0d0d;
+      color: #00ffcc;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      background-color: #111;
+      border-bottom: 1px solid #00ffcc;
+    }
+    .drawer-toggle {
+      font-size: 24px;
+      cursor: pointer;
+      color: #00ffcc;
+      background: none;
+      border: none;
+    }
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -250px;
+      width: 250px;
+      height: 100%;
+      background-color: #111;
+      border-right: 1px solid #00ffcc;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: left 0.3s;
+      z-index: 1000;
+    }
+    .drawer.open {
+      left: 0;
+    }
+    .drawer a {
+      display: block;
+      color: #00ffcc;
+      text-decoration: none;
+      margin: 15px 0;
+      font-weight: bold;
+    }
+    .drawer a:hover {
+      text-decoration: underline;
+    }
+    .leaderboard-btn {
+      background-color: #00ffcc;
+      color: #000;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .language-buttons button {
+      width: 150px;
+      margin: 10px;
+      padding: 10px;
+      background-color: #00ffcc;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .language-buttons button:hover {
+      background-color: #00ddb3;
+    }
+    footer {
+      padding: 10px;
+      border-top: 1px solid #00ffcc;
+    }
+    #sliderText {
+      position: relative;
+      white-space: normal;
+      transition: transform 1s ease-in-out;
+      color: #00ffcc;
+      font-family: 'Courier New', monospace;
+      text-align: center;
+      max-width: 90vw;
+      margin: 10px auto;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+</head>
+<body>
+  <!-- Drawer Sidebar -->
+  <div class="drawer" id="drawer">
+    <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+    <a href="team.html">Team</a>
+    <a href="leaderboard.html">Leaderboard</a>
+    <a href="rule.html">Rule</a>
+  </div>
+
+  <!-- Top Header -->
+  <div class="header">
+    <button class="drawer-toggle" onclick="toggleDrawer()">☰</button>
+    <button class="leaderboard-btn" onclick="window.location.href='leaderboard.html'">Leaderboard</button>
+  </div>
+
+  <!-- Main Dashboard -->
+  <div class="container">
+    <center>
+      <h1>Welcome to BugFix Battle</h1>
+      <div id="sliderText" style="margin-top: 55px; font-size: 21px; font-style: italic;">Loading...</div>
+      <div style="border: #00ddb3 dashed; margin-top: 45px;">
+        <h2 id="welcome" style="margin-top: 15px">Loading username...</h2>
+        
+      </div>
+    </center>
+
+    <p style="color: #00ddb3; margin-top: 35px;">Select your favrouite language:</p>
+    <center>
+      <div class="language-buttons">
+        <button onclick="openLanguage('python')">Python</button>
+        <button onclick="openLanguage('c')">C</button>
+        <button onclick="openLanguage('java')">Java</button>
+        <button onclick="openLanguage('html')">HTML</button>
+      </div>
+    </center>
+  </div>
+
+  <footer style="margin-top: 195px;">
+    <p style="color: #00ddb3; align-self: self-start;margin-bottom: 0px;">About:</p>
+    <p style="margin-top: 0px;">Here is about text</p>
+    <p style="margin-top: 35px; margin-bottom: 0px;">Contact us: </p>
+    <p style="margin-top: 0px;">Here is contact details</p>
+    <center>
+    <p style="margin-top: 45px;">&copy; 2025 BugFix Battle</p>
+    </center>
+  </footer>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCuZMhIdd81uXs4i60C0gj8-vjg0aZvPqE",
+      authDomain: "test-19650.firebaseapp.com",
+      databaseURL: "https://test-19650-default-rtdb.firebaseio.com",
+      projectId: "test-19650",
+      storageBucket: "test-19650.appspot.com",
+      messagingSenderId: "1016131727211",
+      appId: "1:1016131727211:web:8d29c84da73245f321a62e"
+    };
+    firebase.initializeApp(firebaseConfig);
+
+    let currentUser;
+
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        currentUser = user;
+        loadUserData();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    function loadUserData() {
+      firebase.database().ref('users/' + currentUser.uid).once('value')
+        .then(snapshot => {
+          const data = snapshot.val() || {};
+          document.getElementById('welcome').innerText = "Welcome, " + (data.username || "User");
+          document.getElementById('score').innerText = "Score: " + (data.score || 0);
+        });
+    }
+
+    function toggleDrawer() {
+      document.getElementById('drawer').classList.toggle('open');
+    }
+
+    function openLanguage(lang) {
+      window.location.href = `language.html?lang=${lang}`;
+    }
+
+    // Sliding text logic
+    (function() {
+      const messages = [
+        "Fix bugs and climb the leaderboard!",
+        "Choose your language: Python, Java, C, HTML",
+        "1 bug = 1 point. Are you ready?",
+        "Earn respect. Improve code. Learn fast.",
+        "Built by developers, for developers."
+      ];
+      let index = 0;
+      const textEl = document.getElementById("sliderText");
+
+      function showNextText() {
+        textEl.style.transform = "translateX(100%)";
+        setTimeout(() => {
+          textEl.innerText = messages[index];
+          textEl.style.transform = "translateX(-100%)";
+          setTimeout(() => {
+            textEl.style.transform = "translateX(0)";
+          }, 50);
+          index = (index + 1) % messages.length;
+        }, 1000);
+      }
+
+      textEl.innerText = messages[index];
+      index++;
+      setInterval(showNextText, 5000);
+    })();
+  </script>
+</body>
+</html>
