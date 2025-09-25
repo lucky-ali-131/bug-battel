@@ -3,7 +3,10 @@ A website like hackerrank where user can solve the problem and get points<br>
 
 Admin panel is not here, contct us to get Admin panel
 
-@2025 copyright , all rights reserved
+©LuckyAli, All right reserved, 2025 
+
+Not free for Sell or Commercial use
+
 
 
 Register page
